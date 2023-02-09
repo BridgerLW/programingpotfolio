@@ -1,0 +1,400 @@
+//Bridger Wright | 11/29/2022 | spaceship
+SpaceShip s1;
+ArrayList<Cookie> cookie = new ArrayList<Cookie>();
+ArrayList<PowerUp> powerups = new ArrayList<PowerUp>();
+ArrayList<Laser> laser = new ArrayList<Laser>();
+Timer cookieTimer;
+Star[] stars = new Star[100];
+Timer rockTimer, puTimer;
+int score, level;
+boolean play;
+//import processing.sound.*;
+//SoundFile file;
+
+void setup() {
+  size(600, 600);
+  s1 = new SpaceShip();
+  cookieTimer = new Timer(500);
+  cookieTimer.start();
+  puTimer = new Timer (5000);
+  puTimer.start();
+  for (int i=0; i<stars.length; i++) {
+    stars[i] = new Star();
+    //file = new SoundFile(this, "gamemusic_01.wav");
+    //file.play();
+  }
+
+  rockTimer = new Timer (1000);
+  score = 0;
+  level = 1;
+  play = false;
+}
+void draw () {
+  if (!play) {
+    startScreen();
+  } else {
+    background(0, 0, 0);
+
+    noCursor();
+
+    //Adding rocks
+    if (cookieTimer.isFinished()) {
+      cookie.add(new Cookie());
+      cookieTimer.start();
+    }
+    //render cookies
+    for (int i = 0; i < cookie.size(); i++) {
+      Cookie c = cookie.get(i);
+      if (s1.intersect(c)) {
+        s1.health-=c.diam;
+        score-=c.diam;
+      }
+      if (c.reachedBottom()) {
+        cookie.remove(c);
+      } else {
+        c.display();
+        c.display();
+        c.move();
+        println(cookie.size());
+      }
+    }
+    // Render Laser
+    for (int i = laser.size()-1; i >= 0; i--) {
+      Laser l = laser.get(i);
+      for (int j = 0; j < cookie.size(); j++) {
+        Cookie c = cookie.get(j);
+        if (l.intersect(c)) {
+          score+=100;
+          laser.remove(l);
+          cookie.remove(c);
+          //Level increase
+          if (score%1000 == 0) {
+            level+=1;
+            s1.ammo +=100;
+          }
+          cookie.remove(c);
+          laser.remove(l);
+          //todo call the explosion animation
+          // add a sound of explosion
+        }
+      }
+      if (l.reachedTop()) {
+        laser.remove(l);
+      } else {
+        l.display();
+        l.move();
+      }
+    }
+
+    //render stars
+    for (int i=0; i<stars.length; i++) {
+      stars[i].display();
+      stars[i].move();
+    }
+    s1.display();
+    s1.move(mouseX, mouseY);
+    infoPanel();
+    if (s1.health<1) {
+      gameOver();
+      //adding powerups
+      if (puTimer.isFinished()) {
+        powerups.add(new PowerUp());
+        puTimer.start();
+      }
+      //render powerups
+      // Adding PowerUps
+      if (puTimer.isFinished()) {
+        powerups.add(new PowerUp());
+        puTimer.start();
+      }
+
+      // Render PowerUps
+      for (int i = 0; i < powerups.size(); i++) {
+        PowerUp pu = powerups.get(i);
+        if (pu.intersect(s1)) {
+          if (pu.type == 'H') {
+            s1.health += 100;
+          } else if (pu.type == 'A') {
+            s1.ammo += 100;
+          } else if (pu.type == 'P') {
+            score += 1000;
+          }
+          powerups.remove(pu);
+        }
+        if (pu.reachedBottom()) {
+          powerups.remove(pu);
+        } else {
+          pu.display();
+          pu.move();
+        }
+      }
+    }
+  }
+}
+
+void mousePressed() {
+  if (s1.fire() && s1.turretCount == 1) {
+    laser.add(new Laser(s1.x, s1.y));
+    println(laser.size());
+  } else {
+    if (s1.fire() && s1.turretCount == 2) {
+      laser.add(new Laser(s1.x-18, s1.y-29));
+      laser.add(new Laser(s1.x+18, s1.y-29));
+      println(laser.size());
+    }
+  }
+}
+void keyPressed() {
+}
+
+void infoPanel() {
+  fill(100, 100);
+  rectMode(CENTER);
+  rect(width/2, 25, width, 50);
+  fill(255);
+  textSize(25);
+  textAlign(CENTER);
+  text("Score:" + score +
+    " | Health:" + s1.health +
+    " | Level: " + level  +
+    " | Ammo: " + s1.ammo, width/2, 40);
+}
+
+void startScreen() {
+  background(0);
+  fill(255, 0, 255);
+  textAlign(CENTER);
+  text("ATTACK OF THE COOKIES \n left click to shoot,make all the cookies disapear \n click anywhere to begin", width/2, height/2);
+  if (mousePressed) {
+    play = true;
+  }
+}
+
+void gameOver() {
+  background(0);
+  fill(255, 0, 255);
+  textAlign(CENTER);
+  text("Game Over \n nice one rookie cookie", width/2, height/2);
+  play = false;
+  noLoop();
+}
+class Cookie {
+  int x, y, diam, speed;
+  PImage cookie;
+
+  //constructor
+  Cookie() {
+    x = int(random(width));
+    y = -100;
+    diam = int(random(30, 100));
+    speed = int(random(3, 5));
+    cookie = loadImage("COOKIE.png");
+  }
+
+  void display() {
+    imageMode(CENTER);
+    cookie.resize(diam, diam);
+    image(cookie, x, y);
+  }
+  void move() {
+    y += speed;
+  }
+
+  boolean reachedBottom() {
+    if(y>height+50) {
+      return true;
+    }else{
+    return false;
+  }
+}
+}
+class Laser {
+  int x, y, w, h, diam, speed;
+  color c1;
+
+  //constructor
+  Laser(int x, int y) {
+    this.x = x;
+    this.y = y;
+    w = 4;
+    h = 12;
+    speed = 9;
+    c1 = color(200, 0, 0);
+  }
+
+  void display() {
+    noStroke();
+    fill(172, 41, 255);
+    rectMode(CENTER);
+    rect(x, y, w, h);
+    
+  }
+  void move() {
+    y -= speed;
+  }
+
+  boolean reachedTop() {
+    if (y<-10) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+ boolean intersect (Cookie cookie) {
+    float d = dist(x, y, cookie.x, cookie.y);
+    if (d<20) { //refine collison detection
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+class PowerUp {
+  int x, y, diam, speed;
+  char type;
+  // PImage rock;
+
+  // Constructor
+  PowerUp() {
+    x= int(random(width));
+    y=-100;
+    diam=int(random(50, 60));
+    speed=int(random(6, 9));
+    int rand = int (random(3));
+    if (rand == 0) {
+      type = 'H';
+    } else if (rand == 1) {
+      type = 'A';
+    } else {
+      type = 'P';
+    }
+  }
+
+  void display() {
+    fill (0, 222, 0);
+    ellipse(x, y, diam, diam);
+    fill(0);
+    text(type, x, y);
+  }
+
+  void move() {
+    y += speed;
+  }
+
+  boolean reachedBottom() {
+    if (y>height+50) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  boolean intersect(SpaceShip ship) {
+    float d = dist(x, y, ship.x, ship.y);
+    if (d<50) { // refine collision detection
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+class SpaceShip {
+  int x, y, w, ammo, turretCount, health;
+  PImage ship;
+
+  //Constructor
+  SpaceShip() {
+    x = 0;
+    y = 0;
+    w = 90;
+    ammo = 1000;
+    turretCount = 2;
+    health = 300;
+    ship = loadImage("ship4.png");
+  }
+  void display() {
+    imageMode(CENTER);
+    ship.resize(70, 70);
+    noCursor();
+    image(ship, x, y);
+  }
+  void move(int tempX, int tempY) {
+    x = tempX;
+    y = tempY;
+  }
+
+  boolean fire() {
+    if (ammo>0) {
+      ammo--;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  boolean intersect (Cookie cookie) {
+    float d = dist(x, y, cookie.x, cookie.y);
+    if (d<40) { //refine collison detection
+      return true;
+    } else {
+      return false;
+    }
+  }
+}class Star{
+  int x,y,diam,speed;
+  color c1;
+  //constructor
+  Star  (){
+  x = int(random(width));
+  y = int(random(height));
+  diam = int(random(3,8));
+  speed = int(random(2,5));
+  c1 = color(random(0,255),random(0,255),random(0,255));
+  
+  }
+  
+  void display() {
+    fill(c1,128);
+    ellipse(x,y,diam,diam);
+ 
+}
+  void move() {
+  if(y>height+5){
+      y =-10;
+    }else{
+    y += speed;
+  }
+  }
+  boolean reachedBottom(){
+  return true;
+  }
+}
+ //daniel shiffman
+
+class Timer {
+
+  int savedTime; // When Timer started
+  int totalTime; // How long Timer should last
+
+  Timer(int tempTotalTime) {
+    totalTime = tempTotalTime;
+  }
+
+  // Starting the timer
+  void start() {
+    // When the timer starts it stores the current time in milliseconds.
+    savedTime = millis();
+  }
+
+  // The function isFinished() returns true if 5,000 ms have passed. 
+  // The work of the timer is farmed out to this method.
+  boolean isFinished() { 
+    // Check how much time has passed
+    int passedTime = millis()- savedTime;
+    if (passedTime > totalTime) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
