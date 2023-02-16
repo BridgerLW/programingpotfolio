@@ -22,6 +22,6 @@ OOP graphical space themed game
 
 OOP graphical infinite car background
 
-![running car testser](https://github.com/BridgerLW/programingpotfolio/blob/main/images/cartester.png)
+![running car testser](https://github.com/BridgerLW/programingpotfolio/blob/main/images/cartester.png?raw=true)
 
 [car tester source code] (https://github.com/BridgerLW/programingpotfolio/tree/main/SRC)
