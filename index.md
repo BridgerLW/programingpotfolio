@@ -14,7 +14,7 @@ OOP Graphical Calculator build in Processing 4
 
 OOP graphical space themed game
 
-![Running Space game](https://github.com/BridgerLW/programingpotfolio/commit/f69dd169d201796f9fdfad6c3a0a97e88323a6b6)
+![Running Space game](https://raw.githubusercontent.com/BridgerLW/programingpotfolio/f69dd169d201796f9fdfad6c3a0a97e88323a6b6/images/Spacegame.png)
 
 [Space game Source Code](https://github.com/BridgerLW/programingpotfolio/blob/main/SRC/Spacegame)
 
