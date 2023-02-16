@@ -6,7 +6,7 @@
 
 OOP Graphical Calculator build in Processing 4
 
-![Running Calculator]https://github.com/BridgerLW/programingpotfolio/blob/main/images/Calc.png?raw=true
+![Running Calculator](https://github.com/BridgerLW/programingpotfolio/blob/main/images/Calc.png?raw=true)
 
 [Calculator Source Code](https://github.com/BridgerLW/programingpotfolio/tree/main/SRC/calc)
 
