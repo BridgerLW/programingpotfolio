@@ -1,0 +1,51 @@
+#include <algorithm>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+// is_vowel returns true if the given
+// character is a vowel; false otherwise.
+bool is_vowel(char c)
+{
+    c = tolower(c);
+    return c == 'a'
+        or c == 'e'
+        or c == 'i'
+        or c == 'o'
+        or c == 'u'
+        or c == 'y'
+        ;
+}
+
+// to_piglatin translates a string to piglatin.
+//
+// For words that begin with consonant sounds,
+// the initial consonant or consonant cluster
+// is moved to the end of the word, and "ay"
+// is added.
+// For words that begin with vowel sounds or
+// silent letter, you just add "way".
+string to_piglatin(string & s)
+{
+    auto it = find_if(begin(s), end(s), is_vowel);
+    if (it == begin(s)) {
+        s += "way";
+    }
+    else if (it != end(s)) {
+        rotate(begin(s), it, end(s));
+        s += "ay";
+    }
+    return s;
+}
+
+int main(int argc, char* argv[])
+{
+    string s;
+    for (int i = 1; i < argc; i++) {
+        s = argv[i];
+        cout << to_piglatin(s) << " ";
+    }
+    cout << endl;
+    return 0;
+} 
