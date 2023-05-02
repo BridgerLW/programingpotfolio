@@ -1,0 +1,31 @@
+// Bridger Wright | Aug 30 2022 | Col Det
+int xspeed, yspeed;
+int xpos, ypos, wdth, ht;
+//setup runs once at the beginning
+void setup() {
+  size(800, 500);
+  background(0, 0, 0);
+  xspeed = 5;
+  yspeed =5;
+  wdth =10;
+  ht = 14;
+  noStroke();
+  xpos = width/2;
+  ypos = height/100;
+  frameRate(130);
+}
+//draw runs on a loop
+void draw() {
+  //background(255,255,255);
+  fill(random(0),random(255),random(255));
+  ellipse(xpos, ypos, 10, 10);
+
+  xpos += xspeed;
+  ypos += yspeed;
+  if (xpos>= width-wdth/2|| xpos <= wdth) {
+    xspeed*= -1;
+  }
+  if (ypos >= height-ht/2 || ypos<= ht/2) {
+    yspeed = yspeed *-1;
+  }
+}
